@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import lottie from 'lottie-web';
 import { Grid, useMediaQuery, Typography, Button } from '@material-ui/core';
-
+import Header from "../Header/index"
 import { useStyles } from './styles';
 
 const LandingPage = () => {
@@ -22,6 +22,12 @@ const LandingPage = () => {
 
     return (
         <div className={classes.background}>
+            <div>
+                <Header/>
+            </div>
+            <br/>
+            <br/>
+            <br/>
             <Grid container justifyContent="center" alignItems="center" direction={isTabletorMobile?'column-reverse':'row'}>
                 <Grid item xs={12} sm={6} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
                     <Typography variant='h3' gutterBottom className={classes.title}>
