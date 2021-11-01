@@ -23,5 +23,11 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
         color: '#d9e1ee',
         borderColor: '#d9e1ee',
         marginTop: theme.spacing(2)
+    },
+    grid: {
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center'
     }
 }));
