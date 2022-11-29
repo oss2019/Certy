@@ -7,19 +7,42 @@ import { ButtonBase } from '@material-ui/core';
 import Modal from '@material-ui/core/Modal';
 import { useStyles } from './styles';
 import TemplateModal from '../TemplateModal';
+import Success from '../TemplateModal/Sucess';
+import Error from '../TemplateModal/Error';
+import { FlashOnSharp } from '@material-ui/icons';
+
+
 
 const TemplatePage = () => {
 	const classes = useStyles();
 
 	const [open, setOpen] = React.useState(-1);
+	const [loading, setLoading] = React.useState(false);
+	const [result, setResult] = React.useState(false);
+	const [success, setSuccess] = React.useState(-1);
 
 	const handleOpen = (key: number) => {
 		setOpen(key);
 	};
 
+	const openSuccess = (key: number) => {
+		setSuccess(key);
+	};
+
+	const showResult = (val: boolean) => {
+		setResult(val);
+	};
+
 	const handleClose = (key: number) => {
 		setOpen(-1);
+		setResult(false);
 	};
+
+	const preventClose = (val: boolean) => {
+		setLoading(val);
+	};
+
+	
 
 	return (
 		<div className={classes.background}>
@@ -53,12 +76,21 @@ const TemplatePage = () => {
 									open={open === value ? true : false}
 									onClose={() => {
 										// setOpen(false);
-										handleClose(value);
+										!loading && handleClose(value);
 									}}
 									aria-labelledby="simple-modal-title"
 									aria-describedby="simple-modal-description"
 								>
-									<TemplateModal templateName={value} />
+									{
+										result ?
+										<TemplateModal templateName={value} preventClose={preventClose} openSuccess={openSuccess} showResult={showResult} />:
+										(
+											success ?
+											<Error status={success} />:
+											<Success />
+										)
+									}
+									
 								</Modal>
 							</Grid>
 						))}

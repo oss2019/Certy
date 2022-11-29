@@ -4,21 +4,25 @@ export const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
 		modal: {
 			position: 'absolute',
-			width: 900,
-			maxWidth: '70%',
-			height: 500,
+			width: '70%',
+			maxWidth: 500,
+			height: 'auto',
 			backgroundColor: theme.palette.background.paper,
 			borderRadius: 20,
 			boxShadow: theme.shadows[5],
-			padding: theme.spacing(2, 4, 3),
+			padding: theme.spacing(2, 4, 5),
 			// paddingLeft: 100,
-			paddingLeft: '5%',
+			// paddingLeft: '5%',
 		},
 		modalTemplate: {
 			backgroundColor: '#C4C4C4',
-			width: 250,
-			maxWidth: '70%',
-			height: 150,
+			width: '80%',
+			// maxWidth: '70%',
+			aspectRatio:'16/9',
+			
+			marginRight:'auto',
+			marginLeft:'auto',
+			marginTop:50,
 			borderRadius: 10,
 		},
 		inputContainer: {
@@ -36,13 +40,30 @@ export const useStyles = makeStyles((theme: Theme) =>
 			fontSize: 14,
 			paddingLeft: 10,
 			paddingRight: 10,
-
-			width: '610px',
-			maxWidth: '80%',
+			// marginTop: '0.5rem',
+			margin:'0.5rem auto 0',
+			width: '80%',
+			maxWidth: 476,
 			height: '40px',
 			left: '374px',
 			top: '637px',
 		},
+		submitButton: {
+			marginTop: '2rem',
+			
+		},
+		succesParent:{
+			width:'100%',
+			height:'100%',
+			backgroundColor:'#1eda9b',
+			color:'#fff',
+		},
+		errorParent:{
+			width:'100%',
+			height:'100%',
+			backgroundColor:'#f26152',
+			color:'#fff',
+		}
 	})
 );
 
