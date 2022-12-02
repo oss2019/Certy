@@ -1,5 +1,5 @@
 import React from 'react';
-import Grid, { GridSpacing } from '@material-ui/core/Grid';
+import Grid from '@material-ui/core/Grid';
 
 import Paper from '@material-ui/core/Paper';
 import Header from '../Header';
@@ -9,7 +9,7 @@ import { useStyles } from './styles';
 import TemplateModal from '../TemplateModal';
 import Success from '../TemplateModal/Sucess';
 import Error from '../TemplateModal/Error';
-import { FlashOnSharp } from '@material-ui/icons';
+
 
 
 
@@ -20,6 +20,7 @@ const TemplatePage = () => {
 	const [loading, setLoading] = React.useState(false);
 	const [result, setResult] = React.useState(false);
 	const [success, setSuccess] = React.useState(-1);
+	const [errmsg, setErrmsg] = React.useState("");
 
 	const handleOpen = (key: number) => {
 		setOpen(key);
@@ -33,13 +34,17 @@ const TemplatePage = () => {
 		setResult(val);
 	};
 
-	const handleClose = (key: number) => {
+	const handleClose = () => {
 		setOpen(-1);
 		setResult(false);
 	};
 
 	const preventClose = (val: boolean) => {
 		setLoading(val);
+	};
+
+	const handleErr = (key: string) => {
+		setErrmsg(key);
 	};
 
 	
@@ -76,18 +81,18 @@ const TemplatePage = () => {
 									open={open === value ? true : false}
 									onClose={() => {
 										// setOpen(false);
-										!loading && handleClose(value);
+										!loading && handleClose();
 									}}
 									aria-labelledby="simple-modal-title"
 									aria-describedby="simple-modal-description"
 								>
 									{
-										result ?
-										<TemplateModal templateName={value} preventClose={preventClose} openSuccess={openSuccess} showResult={showResult} />:
+										!result ?
+										<TemplateModal templateName={value} preventClose={preventClose} openSuccess={openSuccess} showResult={showResult} errMsg={handleErr} />:
 										(
-											success ?
-											<Error status={success} />:
-											<Success />
+											(success>=0) ?
+											<Error status={success} Close={handleClose} errMsg={errmsg} />:
+											<Success Close={handleClose} />
 										)
 									}
 									

@@ -35,7 +35,9 @@ for i in data:
             uid = str(id_)
 
             path = "Output/" + fileName + "/" + i + "/"
-
+            isExist = os.path.exists(path)
+            if not isExist:
+                os.makedirs(path)
             
             im = Image.open(r'Templates/' + templateName +'.jpg')
             d = ImageDraw.Draw(im)
@@ -47,15 +49,12 @@ for i in data:
             d.text(location, j[0], fill = text_color, font = font)
             d.text(location2, uid, fill = text_color, font = font2)
             
-            isExist = os.path.exists(path)
-            if not isExist:
-                os.makedirs(path)
-            im.save(path+"certificate_" + j[0] + ".pdf")
+            
+            im.save(path+"certificate_" + j[0]+ "_" + uid + ".pdf")
 
-            file_name = path+"certificate_" + j[0] + ".pdf"
+            file_name = path+"certificate_" + j[0] + "_"+ uid + ".pdf"
             with open(file_name, "rb") as f:
                 encoded = Binary(f.read())
 
             collection.update_one({'_id':id_},{'$set':{'file':encoded, 'fileName':"certificate_" + j[0] + ".pdf"}})    
         k = k + 1
-

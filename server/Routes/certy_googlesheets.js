@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const multer = require("multer");
-const { spawnSync } = require("child_process");
+const { spawnSync, exec } = require("child_process");
 const zipLocal = require("zip-local");
 const fs = require("fs");
 const upload = multer();
@@ -28,7 +28,7 @@ router.post("/", upload.none(), async (req, res, next) => {
 
         //Run python script to create certificates
         spawnSync("python", ["main.py", data.sheetTitle, template_id]);
-
+        
         //delete the json file
         fs.unlinkSync("Temp/" + data.sheetTitle + ".json");
 

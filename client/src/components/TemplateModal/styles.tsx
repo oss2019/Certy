@@ -49,20 +49,50 @@ export const useStyles = makeStyles((theme: Theme) =>
 			top: '637px',
 		},
 		submitButton: {
-			marginTop: '2rem',
-			
+			marginTop: '1rem',
 		},
-		succesParent:{
-			width:'100%',
-			height:'100%',
-			backgroundColor:'#1eda9b',
-			color:'#fff',
+		modalError:{
+			position: 'absolute',
+			width: '70%',
+			maxWidth: 500,
+			height: 'auto',
+			// backgroundColor: theme.palette.background.paper,
+			borderRadius: 20,
+			boxShadow: theme.shadows[5],
+			padding: theme.spacing(2, 4, 2),
+			backgroundColor:"#f26152",
+		},
+		modalSuccess:{
+			position: 'absolute',
+			width: '70%',
+			maxWidth: 500,
+			height: 'auto',
+			// backgroundColor: theme.palette.background.paper,
+			borderRadius: 20,
+			boxShadow: theme.shadows[5],
+			padding: theme.spacing(2, 4, 2),
+			backgroundColor:"#20DA9B",
 		},
 		errorParent:{
 			width:'100%',
 			height:'100%',
-			backgroundColor:'#f26152',
 			color:'#fff',
+		},
+		Emoji:{
+			textAlign:'center',
+			padding:"40px 0",
+		},
+		resultMsg:{
+			textAlign:'center',
+			fontSize:'2rem',
+		},
+		returnBtn:{
+			textAlign:'center',
+			padding:theme.spacing(4, 0, 2),
+		},
+		errMsg:{
+			textAlign:'center',
+			margin:theme.spacing(2, 0, 0),
 		}
 	})
 );
