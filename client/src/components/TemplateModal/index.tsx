@@ -1,6 +1,12 @@
 import React from "react";
-import { useState } from "react";
-import { Button, TextField, FormGroup, CircularProgress, ThemeProvider } from "@material-ui/core";
+import { useState, useRef } from "react";
+import {
+    Button,
+    TextField,
+    FormGroup,
+    CircularProgress,
+    ThemeProvider,
+} from "@material-ui/core";
 import { useStyles } from "./styles";
 
 function getModalStyle() {
@@ -15,10 +21,10 @@ function getModalStyle() {
 }
 
 //function to download files and save directly
-function download(blob:Blob, filename:string) {
+function download(blob: Blob, filename: string) {
     const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.style.display = 'none';
+    const a = document.createElement("a");
+    a.style.display = "none";
     a.href = url;
     a.download = filename;
     document.body.appendChild(a);
@@ -32,62 +38,90 @@ interface templateInterface {
     preventClose: Function;
     openSuccess: Function;
     showResult: Function;
-    errMsg:Function;
+    errMsg: Function;
 }
 
-const TemplateModal = ({ templateName, preventClose, openSuccess, showResult, errMsg }: templateInterface) => {
+const TemplateModal = ({
+    templateName,
+    preventClose,
+    openSuccess,
+    showResult,
+    errMsg,
+}: templateInterface) => {
     const classes = useStyles();
     const [link, setlink] = useState("");
-	const [filled, setFilled] = useState(false);
+    const [filled, setFilled] = useState(false);
     const [loading, setLoading] = useState(false);
 
-	let bodyFormData = new FormData();
+    const inputRef = useRef<HTMLInputElement | null>(null);
+    const [file, setFile] = useState<File>();
+    
+    let bodyFormData = new FormData();
 
-	const handleSubmit = (temp:string) => {
+    const handleUpload = (e:React.ChangeEvent<HTMLInputElement>) => {
+        
+        if (!e.target.files) {
+            return;
+        }
+        setFile(e.target.files[0]);
+    };
+
+    const handleSubmit = (temp: string) => {
+        preventClose(true);
         setLoading(true);
-        if(link === ""){
+        if (link === "" && file == null) {
             setFilled(true);
             setLoading(false);
+            preventClose(false);
             return;
-        } ;
-		
-		bodyFormData.append('link', link);
-		bodyFormData.append('templateID', 'template_'+temp);
-        fetch("http://localhost:5000/certy_googleSheet", { method: 'POST', body: bodyFormData })
-        .then((response) => {
-            if(response.status !== 200){
-                response.json()
-                .then(data => ({status: response.status, body: data}))
-                .then((obj:any) => {
-                    console.log(obj);
-                    setLoading(false);
-                    !loading && preventClose(false);
-                    !loading && openSuccess(response.status);
-                    !loading && errMsg(obj.body.error.message);
-                    !loading && showResult(true);
-                });
-            }
-            else{
-                console.log(response);
-                const header = response.headers.get('Content-disposition');
-                const parts = header!.split(';');
-                const filename = parts[1].split("=")[1];
-                response.blob().then(blob => download(blob, filename));
-                setLoading(false);
-                !loading && preventClose(false);
-                !loading && openSuccess(-1);
-                !loading && showResult(true);
-            }
+        }
+        let request:string;
+        bodyFormData.append("link", link);
+        bodyFormData.append("templateID", "template_" + temp);
+        file != null && bodyFormData.append("excel", file);
+        request = (file != null) ? 'http://localhost:5000/certy_upload' : 'http://localhost:5000/certy_googleSheet';
+
+        fetch(request, {
+            method: "POST",
+            body: bodyFormData,
         })
-        .catch((response) => {
-            console.log(response);
-            setLoading(false);
-            !loading && preventClose(false);
-            !loading && openSuccess(response.status);
-            !loading && errMsg("");
-            !loading && showResult(true);
-        });
-    }
+            .then((response) => {
+                if (response.status !== 200) {
+                    response
+                        .json()
+                        .then((data) => ({
+                            status: response.status,
+                            body: data,
+                        }))
+                        .then((obj: any) => {
+                            console.log(obj);
+                            setLoading(false);
+                            preventClose(false);
+                            openSuccess(response.status);
+                            errMsg(obj.body.error.message);
+                            showResult(true);
+                        });
+                } else {
+                    console.log(response);
+                    const header = response.headers.get("Content-disposition");
+                    const parts = header!.split(";");
+                    const filename = parts[1].split("=")[1];
+                    response.blob().then((blob) => download(blob, filename));
+                    setLoading(false);
+                    preventClose(false);
+                    openSuccess(-1);
+                    showResult(true);
+                }
+            })
+            .catch((response) => {
+                console.log(response);
+                setLoading(false);
+                preventClose(false);
+                openSuccess(response.status);
+                errMsg("");
+                showResult(true);
+            });
+    };
 
     const [modalStyle] = React.useState(getModalStyle);
     return (
@@ -102,31 +136,41 @@ const TemplateModal = ({ templateName, preventClose, openSuccess, showResult, er
                         required
                         style={{ width: "100%" }}
                         label="Enter spreadsheet url"
+                        helperText="Enter the url or upload the spreadsheet"
                         variant="filled"
-						error={filled}
+                        error={filled}
+                        disabled={!(file == null)}
                     />
-                    <div>
-                        <div style={{fontSize:"1rem", margin:"8px 0px 8px 8px"}}>OR</div>
-                        <Button variant="contained" color="secondary">Upload a Spreadsheet</Button>
+                    <div className={classes.submitButton}>
+                        
+                        <input
+                            type="file"
+                            name="excel"
+                            accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                            style={{ display: "none" }}
+                            ref={inputRef}
+                            onChange={handleUpload}
+                        />
+
+                        <Button variant="contained" color="secondary" onClick={()=> inputRef.current?.click()} disabled={link !== ""}>
+                        {file ? `${file.name}` : 'Upload a Spreadsheet'}
+                        </Button>
+                        
                     </div>
                     <div className={classes.submitButton}>
-                        {
-                            loading ?
-                            <CircularProgress /> :
+                        {loading ? (
+                            <CircularProgress />
+                        ) : (
                             <Button
                                 value={templateName}
                                 onClick={(e) => {
                                     handleSubmit(e.currentTarget.value);
-                                    preventClose(true);
                                 }}
                                 variant="contained"
-                                
                             >
                                 Generate Certificates
                             </Button>
-                        }
-                       
-                        
+                        )}
                     </div>
                 </FormGroup>
             </div>

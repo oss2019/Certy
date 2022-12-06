@@ -10,6 +10,10 @@ fileName = sys.argv[1]
 templateName = sys.argv[2]
 filejson = fileName + ".json"
 
+# fileName = "Test"
+# templateName = "template_0"
+# filejson = fileName + ".json"
+
 f = open("Temp/" + filejson,)
 data = json.load(f)
 

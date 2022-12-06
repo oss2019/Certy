@@ -48,31 +48,29 @@ router.post("/", upload.single("excel"), async (req, res, next) => {
 
         //Run python script to create certificates
         spawnSync("python", ["main.py", data.sheetTitle, template_id]);
-
-        //delete the json and excel file
+        
+        //delete the json file
         fs.unlinkSync("Temp/" + data.sheetTitle + ".json");
         fs.unlinkSync("upload/" + req.file.originalname);
 
         const savePath = "Temp/" + data.sheetTitle + ".zip";
-
-        zipLocal.sync
-            .zip("Output/" + data.sheetTitle)
-            .compress()
-            .save(savePath);
-
-        //Remove temporary files
+        zipLocal.sync.zip("Output/" + data.sheetTitle).compress().save(savePath);
+        
+        //Remove the temporary files
         fs.rmSync("Output/" + data.sheetTitle, { recursive: true }, (err) => {
             if (err) {
                 throw err;
             }
         });
-
-        const stream = fs.createReadStream(savePath);
-        //set the reponse file name
+        //set the response filename
+        res.setHeader('Access-Control-Expose-Headers','Content-Disposition');
         res.setHeader(
             "Content-disposition",
             "attachment; filename=" + data.sheetTitle + ".zip"
         );
+
+
+        const stream = fs.createReadStream(savePath);
         stream.pipe(res).once("close", () => {
             stream.destroy();
             fs.unlinkSync(savePath);
