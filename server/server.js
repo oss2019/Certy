@@ -6,6 +6,9 @@ const app = express();
 //Allow cross origin requests
 app.use(cors());
 
+//url encoding
+app.use(express.urlencoded({extended:true}));
+
 //Routes
 const certy_link = require("./Routes/certy_googlesheets");
 const certy_upload = require("./Routes/certy_upload");

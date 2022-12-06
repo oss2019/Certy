@@ -1,12 +1,16 @@
 const express = require("express");
 const router = express.Router();
 const multer = require("multer");
-const { spawnSync } = require("child_process");
+const { spawnSync, exec } = require("child_process");
 const zipLocal = require("zip-local");
 const fs = require("fs");
 const upload = multer();
 const createError = require("http-errors");
 const google = require("./GoogleSheetsAPI/sheets");
+
+
+
+router.use(express.urlencoded({extended:true}));
 
 router.post("/", upload.none(), async (req, res, next) => {
     const url = req.body.link;
@@ -24,17 +28,13 @@ router.post("/", upload.none(), async (req, res, next) => {
 
         //Run python script to create certificates
         spawnSync("python", ["main.py", data.sheetTitle, template_id]);
-
+        
         //delete the json file
         fs.unlinkSync("Temp/" + data.sheetTitle + ".json");
 
         const savePath = "Temp/" + data.sheetTitle + ".zip";
-
-        zipLocal.sync
-            .zip("Output/" + data.sheetTitle)
-            .compress()
-            .save(savePath);
-
+        zipLocal.sync.zip("Output/" + data.sheetTitle).compress().save(savePath);
+        
         //Remove the temporary files
         fs.rmSync("Output/" + data.sheetTitle, { recursive: true }, (err) => {
             if (err) {
@@ -42,10 +42,13 @@ router.post("/", upload.none(), async (req, res, next) => {
             }
         });
         //set the response filename
+        res.setHeader('Access-Control-Expose-Headers','Content-Disposition');
         res.setHeader(
             "Content-disposition",
             "attachment; filename=" + data.sheetTitle + ".zip"
         );
+
+
         const stream = fs.createReadStream(savePath);
         stream.pipe(res).once("close", () => {
             stream.destroy();
